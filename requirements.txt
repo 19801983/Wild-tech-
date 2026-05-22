@@ -1,0 +1,7 @@
+streamlit
+openai
+pillow
+moviepy
+opencv-python
+matplotlib
+numpy
