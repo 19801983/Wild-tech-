@@ -1,3 +1,9 @@
+import sys, subprocess
+
+# Install system dependencies before anything else
+subprocess.run(["apt-get", "update", "-qq"], capture_output=True)
+subprocess.run(["apt-get", "install", "-y", "-qq", "libglib2.0-0t64", "libgthread-2.0-0"], capture_output=True)
+
 import streamlit as st
 import openai
 import os
@@ -181,4 +187,4 @@ if st.button("Generate"):
                 pass
 
 st.markdown("---")
-st.caption("⚡ Wild Tech Innovation – fast, obedient image & video agent. Upload or describe – I'll do the rest.")
+st.caption("⚡ Wild Tech Innovation – fast, obedient image & video agent. Upload or describe – I'll do the rest")
