@@ -2,7 +2,6 @@ streamlit
 openai
 pillow
 moviepy
-opencv-python
+opencv-python-headless
 matplotlib
 numpy
-opencv-python-headless==4.8.1.78
