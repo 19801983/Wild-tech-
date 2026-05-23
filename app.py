@@ -1,5 +1,5 @@
 import streamlit as st
-import openai
+from openai import OpenAI
 import os
 import tempfile
 import re
@@ -22,8 +22,6 @@ with st.sidebar:
     base_url = "https://api.deepseek.com/v1"
     model = st.selectbox("Model", ["deepseek-chat", "deepseek-reasoner"], index=0)
     if api_key:
-        openai.api_key = api_key
-        openai.api_base = base_url
         st.success("Connected ✓")
     else:
         st.warning("Paste your API key to start.")
@@ -58,7 +56,8 @@ def call_deepseek(messages, temperature=0.1, max_tokens=2000):
         st.error("API key missing")
         return None
     try:
-        response = openai.ChatCompletion.create(
+        client = OpenAI(api_key=api_key, base_url=base_url)
+        response = client.chat.completions.create(
             model=model,
             messages=messages,
             temperature=temperature,
@@ -129,7 +128,6 @@ if st.button("🚀 Generate"):
     if not prompt.strip():
         st.warning("Please describe what you want.")
     else:
-        # Prepare system prompt
         if mode == "🎨 Image Generator":
             system_msg = IMAGE_PROMPT_TEMPLATE.format(style=style)
         else:
@@ -137,7 +135,6 @@ if st.button("🚀 Generate"):
 
         context = [{"role": "system", "content": system_msg}]
 
-        # Handle uploaded files
         image_path = None
         video_path = None
 
@@ -153,7 +150,6 @@ if st.button("🚀 Generate"):
                 video_path = tmp.name
             context.append({"role": "system", "content": f"An input video is at: {video_path}"})
 
-        # Add user prompt
         context.append({"role": "user", "content": prompt})
 
         with st.spinner("Wild Tech is creating..."):
@@ -168,11 +164,9 @@ if st.button("🚀 Generate"):
             st.text(ai_response)
             st.stop()
 
-        # Show generated code
         with st.expander("📝 View generated code"):
             st.code(code, language="python")
 
-        # Prepare execution environment
         exec_globals = {
             "image_path": image_path,
             "video_path": video_path,
@@ -203,7 +197,6 @@ if st.button("🚀 Generate"):
             if result.get("output"):
                 st.text(result["output"])
 
-            # Show & download results
             if mode == "🎨 Image Generator":
                 if os.path.exists("output_image.png"):
                     st.image("output_image.png", use_column_width=True)
@@ -223,7 +216,6 @@ if st.button("🚀 Generate"):
                 else:
                     st.warning("No output file found. Check the generated code.")
 
-        # Clean up temp files
         for path in [image_path, video_path]:
             if path:
                 try:
